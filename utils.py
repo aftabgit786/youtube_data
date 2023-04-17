@@ -1,4 +1,5 @@
 import time
+import os
 
 
 def scroll_to_page_end(driver):
@@ -30,3 +31,19 @@ def extract_comments_data(soup):
         comments.append([user_name, thumbnail_url, comment_time, likes, comment_text])
 
     return comments
+
+
+def get_channel_directory(channel_url):
+    channel_name = channel_url.split("/")[-2].replace('@', '')
+    channel_dir = os.path.join(os.getcwd(), channel_name)
+    if not os.path.exists(channel_dir):
+        os.mkdir(channel_dir)
+    return channel_dir
+
+
+def get_video_links(soup):
+    video_links = []
+    for video in soup.find_all('ytd-rich-grid-media'):
+        video_url = 'https://www.youtube.com' + video.find('a', {'id': 'video-title-link'}).get('href')
+        video_links.append(video_url)
+    return video_links

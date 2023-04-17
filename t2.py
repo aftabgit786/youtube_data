@@ -3,16 +3,11 @@ import time
 import pandas as pd
 from selenium import webdriver
 from bs4 import BeautifulSoup
-from utils import scroll_to_page_end, extract_comments_data
+from utils import scroll_to_page_end, extract_comments_data, get_channel_directory, get_video_links
 
 
 channel_url = input("Enter the URL of the YouTube channel: ")
 channel_url += "/videos"
-
-channel_name = channel_url.split("/")[-2].replace('@', '')
-channel_dir = os.path.join(os.getcwd(), channel_name)
-if not os.path.exists(channel_dir):
-    os.mkdir(channel_dir)
 
 driver = webdriver.Chrome()
 driver.get(channel_url)
@@ -24,10 +19,8 @@ scroll_to_page_end(driver)
 html = driver.page_source
 soup = BeautifulSoup(html, 'html.parser')
 
-video_links = []
-for video in soup.find_all('ytd-rich-grid-media'):
-    video_url = 'https://www.youtube.com' + video.find('a', {'id': 'video-title-link'}).get('href')
-    video_links.append(video_url)
+channel_dir = get_channel_directory(channel_url)
+video_links = get_video_links(soup)
 
 for video_link in video_links:
     driver.get(video_link)
